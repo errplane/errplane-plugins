@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+function print_usage {
+    echo "Usage: $0 <args>"
+    echo "args:"
+    echo "  -u|--user: The username to use when connecting to mysql"
+    echo "  -p|--password: The password to use when connecting to mysql"
+    echo "  -h|--help: print this help"
+}
+
+mysql_args=""
+
+TEMP=`getopt -o u:p:h --long user:,password:,help \
+     -n $0 -- "$@"`
+
+if [ $? != 0 ] ; then print_usage ; exit 1 ; fi
+
+# Note the quotes around `$TEMP': they are essential!
+eval set -- "$TEMP"
+
+while true ; do
+    case "$1" in
+        -u|--user) mysql_args="$mysql_args -u $2" ; shift 2;;
+        -p|--password) mysql_args="$mysql_args -p $2"; shift 2;;
+        -h|--help) print_usage; exit 1; shift 2;;
+        --) shift ; break ;;
+        *) echo "Internal error!" ; exit 1 ;;
+    esac
+done
+
+# echo "Remaining arguments:"
+# for arg do echo '--> '"\`$arg'" ; done
+
+echo 'show status' | mysql $mysql_args
