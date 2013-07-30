@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+# Exit values:
+# 0 = OK
+# 1 = Warning
+# 2 = Critical
+# 3 = Unknown
+
+if ! which redis-cli > /dev/null 2>&1; then
+    echo "Unkown: Cannot find redis-cli on your path"
+    exit 3
+fi
+
+output=`redis-cli "$@" info`
+
+if [ $? -ne 0 ]; then
+    echo "Critical: redis instance isn't running"
+    exit 2
+fi
+
+if [ "x$output" == "x" ]; then
+    echo "Unkown: redis-cli didn't print any information"
+    exit 3
+fi
+
+uptime_in_seconds=`echo "$output" | grep uptime_in_seconds: | tr -d '\n\r' | cut -d: -f2`
+connected_clients=`echo "$output" | grep connected_clients: | tr -d '\n\r' | cut -d: -f2`
+blocked_clients=`echo "$output" | grep blocked_clients: | tr -d '\n\r' | cut -d: -f2`
+used_memory=`echo "$output" | grep used_memory: | tr -d '\n\r' | cut -d: -f2`
+total_connections_received=`echo "$output" | grep total_connections_received: | tr -d '\n\r' | cut -d: -f2`
+total_commands_processed=`echo "$output" | grep total_commands_processed: | tr -d '\n\r' | cut -d: -f2`
+
+# output:
+#   <Status>:<Message>|metric1=value1 metric2=value2 ...
+
+echo -n "Ok: redis instance is running|"
+echo -n "uptime_in_seconds=$uptime_in_seconds "
+echo -n "connected_clients=$connected_clients "
+echo -n "blocked_clients=$blocked_clients "
+echo -n "used_memory=$used_memory "
+echo -n "total_connections_received=$total_connections_received "
+echo -n "total_commands_processed=$total_commands_processed "
+
+# print number of keys per db, metric name is ${db}.keys
+for line in `echo "$output" | sed -n '/Keyspace/,//P' | tail -n+2`; do
+    db=`echo $line | cut -d: -f1`
+    keys=`echo $line | cut -d: -f2 | cut -d, -f1 | cut -d= -f2`
+    echo -n "${db}.keys=$keys "
+done
+
+echo
+exit 0
