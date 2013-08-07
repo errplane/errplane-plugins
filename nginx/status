@@ -37,6 +37,11 @@ if [ $? -ne 0 ]; then
     exit 2
 fi
 
+if echo "$output" | grep '<html>' >/dev/null 2>&1 ; then
+    echo "Unknown: apache didn't return expected format"
+    exit 3
+fi
+
 if [ "x$output" == "x" ]; then
     echo "Unknown: nginx didn't return any information"
     exit 3
