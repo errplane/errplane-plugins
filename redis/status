@@ -19,7 +19,7 @@ if [ $? -ne 0 ]; then
 fi
 
 if [ "x$output" == "x" ]; then
-    echo "Unkown: redis-cli didn't print any information"
+    echo "Unknown: redis-cli didn't print any information"
     exit 3
 fi
 
