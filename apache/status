@@ -28,7 +28,7 @@ done
 
 # echo "getting stats for $host"
 
-output=`curl 'http://localhost/server-status?auto' 2> /dev/null`
+output=`curl 'http://$host/server-status?auto' 2> /dev/null`
 if [ $? -ne 0 ]; then
     echo "Critical: apache isn't running"
     exit 2
