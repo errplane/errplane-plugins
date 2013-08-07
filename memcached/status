@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+function print_usage {
+    echo "Usage: $0 <args>"
+    echo "args:"
+    echo "  -u|--user: The username to use when connecting to mysql"
+    echo "  -p|--password: The password to use when connecting to mysql"
+    echo "  -h|--help: print this help"
+}
+
+host=localhost
+port=11211
+
+TEMP=`getopt -o p:h --long host:,port:,help \
+     -n $0 -- "$@"`
+
+if [ $? != 0 ] ; then print_usage ; exit 1 ; fi
+
+# Note the quotes around `$TEMP': they are essential!
+eval set -- "$TEMP"
+
+while true ; do
+    case "$1" in
+        -h|--host) host="$2"; shift 2;;
+        -p|--port) port="$2"; shift 2;;
+        --help) print_usage; exit 1; shift;;
+        --) shift ; break ;;
+        *) echo "Internal error!" ; exit 1 ;;
+    esac
+done
+
+output=`echo stats | nc $host $port`
+
+if [ $? -ne 0 ]; then
+    echo "Critical: memcached instance isn't running"
+    exit 2
+fi
+
+if [ "x$output" == "x" -o "x$output" == "xERROR" ]; then
+    echo "Unknown: memcached didn't print expected output"
+    exit 3
+fi
+
+output=`echo "$output" | egrep -v 'END|pid|time|pointer_size' | cut -d' ' -f2- | tr -d '\r' | tr '\n ' ' ='`
+echo "Ok: memcached instance is running|$output"
+exit 0
