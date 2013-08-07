@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+function print_usage {
+    echo "Usage: $0 <args>"
+    echo "args:"
+    echo "  --host:     the hostname (default to localhost)"
+    echo "  -u|--url:   the url to hit for the stats (default to nginx_status)"
+    echo "  -h|--help:  prints this help message"
+}
+
+host=localhost
+url=nginx_status
+
+TEMP=`getopt -o u:h --long url:,host:,help \
+     -n $0 -- "$@"`
+
+if [ $? != 0 ] ; then print_usage ; exit 1 ; fi
+
+# Note the quotes around `$TEMP': they are essential!
+eval set -- "$TEMP"
+
+while true ; do
+    case "$1" in
+        --host) host="$2"; shift 2;;
+        -u|--url) url="$2"; shift 2;;
+        -h|--help) print_usage; exit 1; shift 2;;
+        --) shift ; break ;;
+        *) echo "Internal error!" ; exit 1 ;;
+    esac
+done
+
+# echo "getting stats for $host/$url"
+
+output=`curl "http://$host/$url" 2> /dev/null`
+if [ $? -ne 0 ]; then
+    echo "Critical: nginx isn't running"
+    exit 2
+fi
+
+if [ "x$output" == "x" ]; then
+    echo "Unknown: nginx didn't return any information"
+    exit 3
+fi
+
+# Active connections: 1
+# server accepts handled requests
+#  8 8 22 (accepted-connections handled-connections number-of-reqeusts)
+# Reading: 0 Writing: 1 Waiting: 0
+
+output=`echo "$output" | awk '
+BEGIN {OFS="="; ORS=" "}
+/Active/ {print "active_connections",$3}
+/[0-9]+ [0-9]+/ {
+                print "accepted_connections",$1
+                print "handled_connections",$2
+                print "number_of_requests",$3
+            }
+/Reading/   {
+                print "reading_connections",$2
+                print "writing_connections",$4
+                print "waiting_connections",$6
+            }
+'`
+echo -n "Ok: nginx is running|$output"

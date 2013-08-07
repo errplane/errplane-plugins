@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+which nginx > /dev/null 2>&1
+exit $?
