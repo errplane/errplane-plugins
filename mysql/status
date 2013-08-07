@@ -28,7 +28,20 @@ while true ; do
     esac
 done
 
-# echo "Remaining arguments:"
-# for arg do echo '--> '"\`$arg'" ; done
+# echo "using args: $mysql_args"
 
-echo 'show status' | mysql $mysql_args
+# remove the top line, lower case everything, translate tabs and spaces to '=' and newlines to spaces.
+output=`echo 'show status where value <> "0" and value <> ""' | mysql $mysql_args | tail -n+2 | tr 'A-Z\t \n' 'a-z== '`
+if [ $? -ne 0 ]; then
+    echo "Critical: mysql isn't running"
+    exit 2
+fi
+
+if [ "x$output" == "x" ]; then
+    echo "Unknown: mysql didn't print any information"
+    exit 3
+fi
+
+echo -n "Ok: mysql is running|$output"
+
+
