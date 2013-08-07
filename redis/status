@@ -42,7 +42,7 @@ echo -n "total_connections_received=$total_connections_received "
 echo -n "total_commands_processed=$total_commands_processed "
 
 # print number of keys per db, metric name is ${db}.keys
-for line in `echo "$output" | sed -n '/Keyspace/,//P' | tail -n+2`; do
+for line in `echo "$output" | grep -iE 'db[0-9]:keys'`; do
     db=`echo $line | cut -d: -f1`
     keys=`echo $line | cut -d: -f2 | cut -d, -f1 | cut -d= -f2`
     echo -n "${db}.keys=$keys "
