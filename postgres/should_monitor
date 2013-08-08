@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# what should we check for
+which pg_config > /dev/null 2>&1 || [ -e /etc/init.d/postgresq ]
+exit $?

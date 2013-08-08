@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+
+function print_usage {
+    echo "Usage: $0 <args>"
+    echo "args:"
+    echo "  -u|--user: The username to use when connecting to postgres"
+    echo "  -p|--password: The password to use when connecting to postgres"
+    echo "  -h|--help: print this help"
+}
+
+postgres_args=""
+database=""
+
+TEMP=`getopt -o u:p:d:h --long user:,database:,password:,help \
+     -n $0 -- "$@"`
+
+if [ $? != 0 ] ; then print_usage ; exit 1 ; fi
+
+# Note the quotes around `$TEMP': they are essential!
+eval set -- "$TEMP"
+
+while true ; do
+    case "$1" in
+        -u|--user) postgres_args="$postgres_args -u $2" ; shift 2;;
+        -p|--password) postgres_args="$postgres_args -p $2"; shift 2;;
+        -d|--database) database="$2"; shift 2;;
+        -h|--help) print_usage; exit 1; shift 2;;
+        --) shift ; break ;;
+        *) echo "Internal error!" ; exit 1 ;;
+    esac
+done
+
+# echo "using args: $postgres_args"
+
+# See http://www.postgresql.org/docs/9.1/static/monitoring-stats.html for more information
+# More importantly see section 27.2.2 for information about delays in data collection
+# and the full list of stats tables.
+
+if [ "x$database" != "x" ]; then
+    where_clause="where datname = '$database'"
+fi
+
+output=`echo "select * from pg_stat_database $where_clause" | psql 2>/dev/null`
+if [ $? -ne 0 ]; then
+    echo "Critical: postgres isn't running"
+    exit 2
+fi
+
+if [ "x$output" == "x" ]; then
+    echo "Unknown: postgres didn't print any information"
+    exit 3
+fi
+
+# get the transactions numbers
+output=`echo "$output" | tail -n+3 | head -n-1 | awk '
+function ltrim(s) { sub(/^[ \t\r\n]+/, "", s); return s }
+function rtrim(s) { sub(/[ \t\r\n]+$/, "", s); return s }
+function trim(s)  { return rtrim(ltrim(s)); }
+BEGIN    {FS="|"; OFS="="; ORS=" "}
+{
+  print "xact_commit",trim($4)
+  print "xact_rollback",trim($5)
+  print "blks_read",trim($6)
+  print "blks_hit",trim($7)
+  print "tuples_returned",trim($8)
+  print "tuples_fetched",trim($9)
+  print "tuples_inserted",trim($10)
+  print "tuples_updated",trim($11)
+  print "tuples_deleted",trim($12)
+  print "deadlocks",trim($16)
+}
+'`
+
+echo -n "Ok: postgres is running|$output"
