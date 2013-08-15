@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+test -e /usr/share/elasticsearch/bin/elasticsearch > /dev/null 2>&1
+exit $?

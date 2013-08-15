@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+
+progname=`basename $0`
+
+OK=0
+CRITICAL=2
+UNKNOWN=3
+hostname="localhost"
+port=9200
+status_page="/_cluster/health"
+secure=0
+
+print_usage() {
+    echo "$progname is a Nagios plugin to check the cluster status of elasticsearch."
+	echo "It also parses the status page to get a few useful variables out, and return"
+	echo "them in the output."
+    echo ""
+    echo "$progname -H localhost -P 9200 -o /tmp"
+    echo ""
+    echo "Options:"
+    echo "  -H/--hostname)"
+    echo "     Defines the hostname. Default is: localhost"
+    echo "  -P/--port)"
+    echo "     Defines the port. Default is: 9200"
+    echo "  -o/--output-directory)"
+    echo "     Specifies where to write the tmp-file that the check creates."
+    echo "     Default is: /tmp"
+    exit $UNKNOWN
+}
+
+TEMP=`getopt -o H:P:ho: --long host:,port:,help,output-directory \
+     -n $0 -- "$@"`
+
+if [ $? != 0 ] ; then print_usage ; exit 1 ; fi
+
+# Note the quotes around `$TEMP': they are essential!
+eval set -- "$TEMP"
+
+while true ; do
+    case "$1" in
+        -help|-h) print_help; exit $UNKNOWN;;
+        --hostname|-H) hostname=$2;shift;;
+        --port|-P) port=$2;shift;;
+        --output-directory|-o) output_dir=$2; shift;;
+        --) shift; break;;
+        *) echo "Unknown argument: $1"; print_usage;;
+    esac
+done
+
+get_status() {
+    filename=${progname}-${hostname}-${status_page}.1
+    filename=`echo $filename | tr -d '\/'`
+    filename=${output_dir}/${filename}
+}
+health=`curl -H Host:stats http://${hostname}:${port}/${status_page}?pretty=true 2>/dev/null`
+if [ $? -ne 0 ]; then
+        echo "CRITICAL - Could not connect to server $hostname"
+        exit $CRITICAL
+fi
+
+name=`echo "$health" | grep cluster_name | awk '{print $3}' | sed 's|[",]||g'`
+if [ -z "$name" ]; then
+    echo "CRITICAL - Error parsing server output"
+    exit $CRITICAL
+fi
+status=`echo "$health" | grep status | awk '{print $3}' | sed 's|[",]||g'`
+timed_out=`echo "$health" | grep timed_out | awk '{print $3}' | sed 's|[",]||g'`
+number_nodes=`echo "$health" | grep number_of_nodes | awk '{print $3}' | sed 's|[",]||g'`
+number_data_nodes=`echo "$health" | grep number_of_data_nodes | awk '{print $3}' | sed 's|[",]||g'`
+active_primary_shards=`echo "$health" | grep active_primary_shards | awk '{print $3}' | sed 's|[",]||g'`
+active_shards=`echo "$health" | grep active_shards | awk '{print $3}' | sed 's|[",]||g'`
+relocating_shards=`echo "$health" | grep relocating_shards | awk '{print $3}' | sed 's|[",]||g'`
+initializing_shards=`echo "$health" | grep initializing_shards | awk '{print $3}' | sed 's|[",]||g'`
+unassigned_shards=`echo "$health" | grep unassigned_shards | awk '{print $3}' | sed 's|[",]||g'`
+
+output="elasticsearch ($name) is running. | status=${status} timed_out=${timed_out} \
+number_of_nodes=${number_nodes} number_of_data_nodes=${number_data_nodes} active_primary_shards=${active_primary_shards} \
+active_shards=${active_shards} relocating_shards=${relocating_shards} initializing_shards=${initializing_shards} \
+unassigned_shards=${unassigned_shards} "
+
+if [ "$status" = "red" -o "$status" = "yellow" ]; then
+	echo -n "CRITICAL"
+	EXST=$CRITICAL
+elif [ "$status" = "green" ]; then
+	echo -n "OK"
+	EXST=$OK
+else
+	echo -n "UNKNOWN"
+	EXST=$UNKNOWN
+fi
+
+echo ". $output"
+
+exit $EXST
