@@ -23,10 +23,9 @@ eval set -- "$TEMP"
 while true ; do
     case "$1" in
         -u|--user) mysql_args="$mysql_args -u $2" ; shift 2;;
-        -p|--password) mysql_args="$mysql_args -p $2"; shift 2;;
+        -p|--password) mysql_args="$mysql_args -p$2"; shift 2;;
         -H|--host) mysql_args="$mysql_args -h $2"; shift 2;;
         -P|--port) mysql_args="$mysql_args -P $2"; shift 2;;
-        -p|--password) mysql_args="$mysql_args -p $2"; shift 2;;
         -h|--help) print_usage; exit 1; shift 2;;
         --) shift ; break ;;
         *) echo "Internal error!" ; exit 1 ;;
