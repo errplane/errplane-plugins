@@ -2,8 +2,9 @@ version: 1.0
 output: nagios
 needs-dependencies: false
 calculate-rates:
-  - "queries"
-  - "com_.*"
-  - "handler_.*"
-  - "qcache_.*"
-  - "table_locks_.*"
+  - queries
+  - com_.*
+  - handler_.*
+  - qcache_.*
+  - table_locks_.*
+  - bytes_.*
