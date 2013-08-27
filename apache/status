@@ -4,12 +4,12 @@ function print_usage {
     echo "Usage: $0 <args>"
     echo "args:"
     echo "  --host:     the hostname (default to localhost)"
-    echo "  -h|--help:  prints this help message"
+    echo "  --help:  prints this help message"
 }
 
 host="localhost"
 
-TEMP=`getopt -o h --long host:,help \
+TEMP=`getopt -o "" --long host:,help \
      -n $0 -- "$@"`
 
 if [ $? != 0 ] ; then print_usage ; exit 1 ; fi
@@ -20,7 +20,7 @@ eval set -- "$TEMP"
 while true ; do
     case "$1" in
         --host) host="$2"; shift 2;;
-        -h|--help) print_usage; exit 1; shift 2;;
+        --help) print_usage; exit 1; shift 2;;
         --) shift ; break ;;
         *) echo "Internal error!" ; exit 1 ;;
     esac

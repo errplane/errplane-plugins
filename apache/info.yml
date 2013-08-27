@@ -1,3 +1,20 @@
 version: 1.0
 output: nagios
 needs-dependencies: false
+basic-stats:
+  - name: Bytes/second
+    metric: bytespersec
+    units: bytes
+  - name: Requests/sec
+    metric: reqpersec
+    units: raw
+  - name: Busy workers
+    metric: busyworkers
+    units: raw
+  - name: Idle workers
+    metric: idleworkers
+    units: raw
+arguments:
+  - name: host
+    description: The hostname where apache is running
+    default_value: localhost
