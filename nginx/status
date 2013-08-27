@@ -4,14 +4,14 @@ function print_usage {
     echo "Usage: $0 <args>"
     echo "args:"
     echo "  --host:     the hostname (default to localhost)"
-    echo "  -u|--url:   the url to hit for the stats (default to nginx_status)"
-    echo "  -h|--help:  prints this help message"
+    echo "  --url:   the url to hit for the stats (default to nginx_status)"
+    echo "  --help:  prints this help message"
 }
 
 host=localhost
 url=nginx_status
 
-TEMP=`getopt -o u:h --long url:,host:,help \
+TEMP=`getopt -o "" --long url:,host:,help \
      -n $0 -- "$@"`
 
 if [ $? != 0 ] ; then print_usage ; exit 1 ; fi
@@ -22,8 +22,8 @@ eval set -- "$TEMP"
 while true ; do
     case "$1" in
         --host) host="$2"; shift 2;;
-        -u|--url) url="$2"; shift 2;;
-        -h|--help) print_usage; exit 1; shift 2;;
+        --url) url="$2"; shift 2;;
+        --help) print_usage; exit 1; shift 2;;
         --) shift ; break ;;
         *) echo "Internal error!" ; exit 1 ;;
     esac
@@ -38,7 +38,7 @@ if [ $? -ne 0 ]; then
 fi
 
 if echo "$output" | grep '<html>' >/dev/null 2>&1 ; then
-    echo "Unknown: apache didn't return expected format"
+    echo "Unknown: nginx didn't return expected format"
     exit 3
 fi
 
