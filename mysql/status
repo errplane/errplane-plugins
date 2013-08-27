@@ -3,16 +3,16 @@
 function print_usage {
     echo "Usage: $0 <args>"
     echo "args:"
-    echo "  -H|--host: The hostname to use when connecting to mysql"
-    echo "  -P|--port: The port to use when connecting to mysql"
-    echo "  -u|--user: The username to use when connecting to mysql"
-    echo "  -p|--password: The password to use when connecting to mysql"
-    echo "  -h|--help: print this help"
+    echo "  --host: The hostname to use when connecting to mysql"
+    echo "  --port: The port to use when connecting to mysql"
+    echo "  --user: The username to use when connecting to mysql"
+    echo "  --password: The password to use when connecting to mysql"
+    echo "  --help: print this help"
 }
 
 mysql_args=""
 
-TEMP=`getopt -o u:p:H:P:h --long user:,password:,port:,host:,help \
+TEMP=`getopt -o "" --long user:,password:,port:,host:,help \
      -n $0 -- "$@"`
 
 if [ $? != 0 ] ; then print_usage ; exit 1 ; fi
@@ -22,11 +22,11 @@ eval set -- "$TEMP"
 
 while true ; do
     case "$1" in
-        -u|--user) mysql_args="$mysql_args -u $2" ; shift 2;;
-        -p|--password) mysql_args="$mysql_args -p$2"; shift 2;;
-        -H|--host) mysql_args="$mysql_args -h $2"; shift 2;;
-        -P|--port) mysql_args="$mysql_args -P $2"; shift 2;;
-        -h|--help) print_usage; exit 1; shift 2;;
+        --user) mysql_args="$mysql_args -u $2" ; shift 2;;
+        --password) mysql_args="$mysql_args -p$2"; shift 2;;
+        --host) mysql_args="$mysql_args -h $2"; shift 2;;
+        --port) mysql_args="$mysql_args -P $2"; shift 2;;
+        --help) print_usage; exit 1; shift 2;;
         --) shift ; break ;;
         *) echo "Internal error!" ; exit 1 ;;
     esac

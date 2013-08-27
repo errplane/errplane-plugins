@@ -8,3 +8,29 @@ calculate-rates:
   - qcache_.*
   - table_locks_.*
   - bytes_.*
+basic-stats:
+  - name: Queries/second
+    metric: queries.rate
+    units: raw
+  - name: Select scans
+    metric: select_scan
+    units: raw
+  - name: Threads
+    metric: threads_running
+    units: raw
+  - name: Connections
+    metric: connections
+    units: raw
+arguments:
+  - name: host
+    description: The hostname to use when connecting to mysql
+    default: localhost
+  - name: port
+    description: The port to use when connecting to mysql
+    default: 3306 (or whatever is in my.cnf)
+  - name: user
+    description: The username to use when connecting to mysql
+    default:
+  - name: password
+    description: The password to use when connecting to mysql
+    default:
