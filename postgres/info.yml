@@ -1,3 +1,23 @@
 version: 1.0
 output: nagios
 needs-dependencies: false
+basic-stats:
+  - name: Tuples Fetched
+    metric: tuples_fetched
+    units: raw
+  - name: Tuples Inserted
+    metric: tuples_inserted
+    units: raw
+  - name: Tuples Updated
+    metric: tuples_updated
+    units: raw
+  - name: Tuples Deleted
+    metric: tuples_deted
+    units: raw
+arguments:
+  - name: user
+    description: The username to use when connecting to postgres
+    default: ""
+  - name: password
+    description: The password to use when connecting to postgres
+    default: ""

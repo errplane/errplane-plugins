@@ -3,15 +3,15 @@
 function print_usage {
     echo "Usage: $0 <args>"
     echo "args:"
-    echo "  -u|--user: The username to use when connecting to postgres"
-    echo "  -p|--password: The password to use when connecting to postgres"
-    echo "  -h|--help: print this help"
+    echo "  --user: The username to use when connecting to postgres"
+    echo "  --password: The password to use when connecting to postgres"
+    echo "  --help: print this help"
 }
 
 postgres_args=""
 database=""
 
-TEMP=`getopt -o u:p:d:h --long user:,database:,password:,help \
+TEMP=`getopt -o "" --long user:,database:,password:,help \
      -n $0 -- "$@"`
 
 if [ $? != 0 ] ; then print_usage ; exit 1 ; fi
@@ -21,10 +21,10 @@ eval set -- "$TEMP"
 
 while true ; do
     case "$1" in
-        -u|--user) postgres_args="$postgres_args -u $2" ; shift 2;;
-        -p|--password) postgres_args="$postgres_args -p $2"; shift 2;;
-        -d|--database) database="$2"; shift 2;;
-        -h|--help) print_usage; exit 1; shift 2;;
+        --user) postgres_args="$postgres_args -u $2" ; shift 2;;
+        --password) postgres_args="$postgres_args -p $2"; shift 2;;
+        --database) database="$2"; shift 2;;
+        --help) print_usage; exit 1; shift 2;;
         --) shift ; break ;;
         *) echo "Internal error!" ; exit 1 ;;
     esac
