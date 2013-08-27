@@ -12,23 +12,19 @@ secure=0
 
 print_usage() {
     echo "$progname is a Nagios plugin to check the cluster status of elasticsearch."
-	echo "It also parses the status page to get a few useful variables out, and return"
-	echo "them in the output."
+	  echo "It also parses the status page to get a few useful variables out, and return"
+	  echo "them in the output."
     echo ""
-    echo "$progname -H localhost -P 9200 -o /tmp"
+    echo "$progname --hostname localhost --port 9200 --output /tmp"
     echo ""
     echo "Options:"
-    echo "  -H/--hostname)"
-    echo "     Defines the hostname. Default is: localhost"
-    echo "  -P/--port)"
-    echo "     Defines the port. Default is: 9200"
-    echo "  -o/--output-directory)"
-    echo "     Specifies where to write the tmp-file that the check creates."
-    echo "     Default is: /tmp"
+    echo "  --hostname: Defines the hostname. Default is: localhost"
+    echo "  --port: Defines the port. Default is: 9200"
+    echo "  --output-directory: Specifies where to write the tmp-file that the check creates (default to /tmp)."
     exit $UNKNOWN
 }
 
-TEMP=`getopt -o H:P:ho: --long host:,port:,help,output-directory \
+TEMP=`getopt -o "" --long host:,port:,help,output-directory \
      -n $0 -- "$@"`
 
 if [ $? != 0 ] ; then print_usage ; exit 1 ; fi

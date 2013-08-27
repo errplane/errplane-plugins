@@ -1,3 +1,26 @@
 version: 1.0
 output: nagios
 needs-dependencies: false
+basic-stats:
+  - name: Nodes
+    metric: number_of_nodes
+    units: raw
+  - name: Active Shards
+    metric: active_shards
+    units: raw
+  - name: Relocating Shards
+    metric: relocating_shards
+    units: raw
+  - name: Initializing Shards
+    metric: initializing_shards
+    units: raw
+arguments:
+  - name: hostname
+    description: Defines the hostname. Default is: localhost
+    default: localhost
+  - name: port
+    description: Defines the port
+    default: 9200
+  - name: output-directory
+    description: Specifies where to write the tmp-file
+    default: /tmp
