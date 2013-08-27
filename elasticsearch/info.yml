@@ -16,7 +16,7 @@ basic-stats:
     units: raw
 arguments:
   - name: hostname
-    description: Defines the hostname. Default is: localhost
+    description: "Defines the hostname. Default is: localhost"
     default: localhost
   - name: port
     description: Defines the port
