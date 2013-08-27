@@ -1,3 +1,29 @@
 version: 1.0
 output: nagios
 needs-dependencies: false
+basic-stats:
+  - name: Used Memory
+    metric: used_memory
+    units: bytes
+  - name: Number of keys
+    metric: db0.keys
+    units: raw
+  - name: Commands Processed
+    metric: total_commands_processed
+    units: raw
+  - name: Connected Clients
+    metric: connected_clients
+    units: raw
+arguments:
+  - name: host
+    description: The hostname to use when connecting to redis
+    default_value: localhost
+  - name: port
+    description: The port to use when connecting to redis
+    default_value: 6379
+  - name: password
+    description: The password to use when connecting to redis
+    default_value:
+  - name: database
+    description: The database to use when connecting to redis
+    default_value: 0

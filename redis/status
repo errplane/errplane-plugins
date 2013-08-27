@@ -6,12 +6,44 @@
 # 2 = Critical
 # 3 = Unknown
 
+function print_usage {
+    echo "Usage: $0 <args>"
+    echo "args:"
+    echo "  --host: The hostname to use when connecting to redis"
+    echo "  --port: The port to use when connecting to redis"
+    echo "  --password: The password to use when connecting to redis"
+    echo "  --database: The database to use when connecting to redis"
+    echo "  --help: print this help"
+}
+
+redis_args=""
+
+TEMP=`getopt -o "" --long host:,port:,password:,database:,help \
+     -n $0 -- "$@"`
+
+if [ $? != 0 ] ; then print_usage ; exit 1 ; fi
+
+# Note the quotes around `$TEMP': they are essential!
+eval set -- "$TEMP"
+
+while true ; do
+    case "$1" in
+        --host) redis_args="$redis_args -h $2"; shift 2;;
+        --port) redis_args="$redis_args -p $2"; shift 2;;
+        --password) redis_args="$redis_args -a $2"; shift 2;;
+        --database) redis_args="$redis_args -n $2" ; shift 2;;
+        --help) print_usage; exit 1; shift 2;;
+        --) shift ; break ;;
+        *) echo "Internal error!" ; exit 1 ;;
+    esac
+done
+
 if ! which redis-cli > /dev/null 2>&1; then
-    echo "Unkown: Cannot find redis-cli on your path"
+    echo "Unknown: Cannot find redis-cli on your path"
     exit 3
 fi
 
-output=`redis-cli "$@" info`
+output=`redis-cli $redis_args info`
 
 if [ $? -ne 0 ]; then
     echo "Critical: redis instance isn't running"
