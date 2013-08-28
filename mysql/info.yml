@@ -12,8 +12,8 @@ basic-stats:
   - name: Queries/second
     metric: queries.rate
     units: raw
-  - name: Select scans
-    metric: select_scan
+  - name: Select scans/second
+    metric: select_scan.rate
     units: raw
   - name: Threads
     metric: threads_running
