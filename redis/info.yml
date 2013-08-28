@@ -10,7 +10,7 @@ basic-stats:
   - name: Number of keys
     metric: db0.keys
     units: raw
-  - name: Commands Processed/second
+  - name: Commands/second
     metric: total_commands_processed.rate
     units: raw
   - name: Connected Clients
