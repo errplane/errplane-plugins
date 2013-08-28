@@ -19,7 +19,7 @@ basic-stats:
     metric: threads_running
     units: raw
   - name: Connections
-    metric: connections
+    metric: threads_connected
     units: raw
 arguments:
   - name: host
