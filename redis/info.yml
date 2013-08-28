@@ -1,6 +1,8 @@
 version: 1.0
 output: nagios
 needs-dependencies: false
+calculate-rates:
+  - total.*
 basic-stats:
   - name: Used Memory
     metric: used_memory
@@ -8,8 +10,8 @@ basic-stats:
   - name: Number of keys
     metric: db0.keys
     units: raw
-  - name: Commands Processed
-    metric: total_commands_processed
+  - name: Commands Processed/second
+    metric: total_commands_processed.rate
     units: raw
   - name: Connected Clients
     metric: connected_clients
