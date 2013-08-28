@@ -8,6 +8,7 @@ calculate-rates:
   - qcache_.*
   - table_locks_.*
   - bytes_.*
+  - select_scan.*
 basic-stats:
   - name: Queries/second
     metric: queries.rate
