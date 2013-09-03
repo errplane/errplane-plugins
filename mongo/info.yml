@@ -1,0 +1,26 @@
+version: 1.0
+output: nagios
+needs-dependencies: false
+basic-stats:
+  - name: Average object size
+    metric: avgobjsize
+    units: raw
+  - name: Storage size
+    metric: storagesize
+    units: raw
+arguments:
+  - name: host
+    description: The hostname to use when connecting to mongodb
+    default: localhost
+  - name: port
+    description: The port to use when connecting to mongodb
+    default:
+  - name: user
+    description: The username to use when connecting to mongodb
+    default:
+  - name: password
+    description: The password to use when connecting to mongodb
+    default:
+  - name: address
+    description: The db address (example 192.169.0.5:9999/foo)
+    default:

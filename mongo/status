@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+function print_usage {
+    echo "Usage: $0 <args>"
+    echo "args:"
+    echo "  --host: The hostname to use when connecting to mongo"
+    echo "  --port: The port to use when connecting to mongo"
+    echo "  --user: The username to use when connecting to mongo"
+    echo "  --password: The password to use when connecting to mongo"
+    echo "  --address: The db address (example 192.169.0.5:9999/foo)"
+    echo "  --help: print this help"
+}
+
+mongo_args=""
+
+TEMP=`getopt -o "" --long user:,password:,port:,host:,address:,help \
+     -n $0 -- "$@"`
+
+if [ $? != 0 ] ; then print_usage ; exit 1 ; fi
+
+# Note the quotes around `$TEMP': they are essential!
+eval set -- "$TEMP"
+
+while true ; do
+    case "$1" in
+        --user) mongo_args="$mongo_args -u $2" ; shift 2;;
+        --password) mongo_args="$mongo_args -p$2"; shift 2;;
+        --host) mongo_args="$mongo_args -h $2"; shift 2;;
+        --port) mongo_args="$mongo_args -P $2"; shift 2;;
+        --address) address_args="$mongo_args $2"; shift 2;;
+        --help) print_usage; exit 1; shift 2;;
+        --) shift ; break ;;
+        *) echo "Internal error!" ; exit 1 ;;
+    esac
+done
+
+# echo "using args: $mongo_args"
+
+# remove the top line, lower case everything, translate tabs and spaces to '=' and newlines to spaces.
+output=`echo "db.stats()
+exit" | mongo | sed -n '/{/,/}/P' | egrep -v '{|}|ok' | tr -d ' \t,"' | tr 'A-Z' 'a-z' | awk '
+BEGIN {FS=":";OFS="=";ORS=" "}
+{print $1,$2}
+' `
+if [ $? -ne 0 ]; then
+    echo "Critical: mongo isn't running"
+    exit 2
+fi
+
+if [ "x$output" == "x" ]; then
+    echo "Unknown: mongo didn't print any information"
+    exit 3
+fi
+
+echo -n "Ok: mongo is running|$output"
+
+

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+which mongo >/dev/null 2>&1
+exit $?
