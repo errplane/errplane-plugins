@@ -37,7 +37,7 @@ done
 # echo "using args: $mongo_args"
 
 # remove the top line, lower case everything, translate tabs and spaces to '=' and newlines to spaces.
-output=`echo 'db.stats()' | mongo $mongo_args | sed -n '/{/,/}/P' | egrep -v '{|}|ok' | tr -d ' \t,"' | tr 'A-Z' 'a-z' | awk '
+output=`echo 'db.stats()' | mongo $mongo_args | sed -n '/{/,/}/P' | egrep -v '{|}|ok|db' | tr -d ' \t,"' | tr 'A-Z' 'a-z' | awk '
 BEGIN {FS=":";OFS="=";ORS=" "}
 {print $1,$2}
 ' `
